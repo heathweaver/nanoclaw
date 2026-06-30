@@ -8,6 +8,9 @@
 // slack
 import './slack.js';
 
+// paperclip
+import './paperclip.js';
+
 // telegram
 
 // whatsapp
