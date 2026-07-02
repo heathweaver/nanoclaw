@@ -320,7 +320,11 @@ async function runAgent(
   onOutput?: (output: ContainerOutput) => Promise<void>,
 ): Promise<'success' | 'error'> {
   const isMain = group.isMain === true;
-  const sessionId = sessions[group.folder];
+  // The jobsearch intake agent is stateless: every message is an independent job,
+  // and the fit criteria live in its CLAUDE.md. Never resume its session, so each
+  // run reloads the current CLAUDE.md instead of carrying an old system prompt.
+  const sessionId =
+    group.folder === 'jobsearch' ? undefined : sessions[group.folder];
 
   // Update tasks snapshot for container to read (filtered by group)
   const tasks = getAllTasks();
