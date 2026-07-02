@@ -26,6 +26,7 @@ import {
   stopContainer,
 } from './container-runtime.js';
 import { detectAuthMode } from './credential-proxy.js';
+import { readEnvFile } from './env.js';
 import { validateAdditionalMounts } from './mount-security.js';
 import { RegisteredGroup } from './types.js';
 
@@ -246,6 +247,13 @@ function buildContainerArgs(
     args.push('-e', 'ANTHROPIC_API_KEY=placeholder');
   } else {
     args.push('-e', 'CLAUDE_CODE_OAUTH_TOKEN=placeholder');
+  }
+
+  // Forward the getajob MCP token (read from .env) to the container agent so the
+  // jobsearch intake can create job entries via the getajob MCP server.
+  const extraSecrets = readEnvFile(['GETAJOB_MCP_TOKEN']);
+  if (extraSecrets.GETAJOB_MCP_TOKEN) {
+    args.push('-e', `GETAJOB_MCP_TOKEN=${extraSecrets.GETAJOB_MCP_TOKEN}`);
   }
 
   // Runtime-specific args for host gateway resolution

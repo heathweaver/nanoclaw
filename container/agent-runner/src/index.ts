@@ -469,6 +469,7 @@ async function runQuery(
         'Skill',
         'NotebookEdit',
         'mcp__nanoclaw__*',
+        'mcp__getajobai__*',
       ],
       env: sdkEnv,
       permissionMode: 'bypassPermissions',
@@ -484,6 +485,17 @@ async function runQuery(
             NANOCLAW_IS_MAIN: containerInput.isMain ? '1' : '0',
           },
         },
+        ...(process.env.GETAJOB_MCP_TOKEN
+          ? {
+              getajobai: {
+                type: 'http' as const,
+                url: 'https://getajobai.ssc.pm/mcp',
+                headers: {
+                  Authorization: `Bearer ${process.env.GETAJOB_MCP_TOKEN}`,
+                },
+              },
+            }
+          : {}),
       },
       hooks: {
         PreCompact: [
