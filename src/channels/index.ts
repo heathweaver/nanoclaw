@@ -14,3 +14,4 @@ import './paperclip.js';
 // telegram
 
 // whatsapp
+import './whatsapp.js';
