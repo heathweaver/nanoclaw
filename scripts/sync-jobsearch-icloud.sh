@@ -23,9 +23,22 @@ for g in "${JOB_GROUPS[@]}"; do
   CV="$BASE/$g/cv"
   [ -d "$APPS" ] || continue
 
-  for pkg in "$APPS"/*.package.md; do
-    base="$(basename "$pkg")"
-    slug="${base%.package.md}"
+  # Build the set of job slugs for this group. A job is identified by its
+  # package manifest (<slug>.package.md) OR its cover PDF (<slug>-cover.pdf /
+  # <slug>-cover+cases.pdf). Keying off .package.md alone silently skipped jobs
+  # submitted without one (e.g. Beacon, palantir-fdai-london) — they have a
+  # cover but no manifest, so they never reached iCloud. Note-only files
+  # (<slug>.md, <slug>-pastesheet.md) are NOT job keys: they belong to a job
+  # and get copied by the <slug>* sweep below, but must not spawn their own
+  # folder. (sed instead of associative arrays: macOS launchd runs bash 3.2.)
+  slugs="$(
+    { for f in "$APPS"/*.package.md;     do [ -f "$f" ] && basename "$f" | sed 's/\.package\.md$//'; done
+      for f in "$APPS"/*-cover.pdf;       do [ -f "$f" ] && basename "$f" | sed 's/-cover\.pdf$//'; done
+      for f in "$APPS"/*-cover+cases.pdf; do [ -f "$f" ] && basename "$f" | sed 's/-cover+cases\.pdf$//'; done
+    } | sort -u
+  )"
+
+  while IFS= read -r slug; do
     [ -n "$slug" ] || continue
     dest="$ICLOUD/$slug"
     mkdir -p "$dest"
@@ -38,5 +51,7 @@ for g in "${JOB_GROUPS[@]}"; do
     for f in "$CV/"*"$slug"*.pdf; do
       [ -f "$f" ] && cp -p "$f" "$dest/" 2>/dev/null
     done
-  done
+  done <<EOF
+$slugs
+EOF
 done
