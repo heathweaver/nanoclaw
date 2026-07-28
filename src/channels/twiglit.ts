@@ -365,7 +365,7 @@ export class TwiglitChannel implements Channel {
       ownerId
         ? `    • assignee_id = ${ownerId} (this is Heath — REQUIRED so the twig lands in his list; a child twig with no assignee is invisible to him).`
         : `    • assignee_id = Heath's user id — call mcp__twiglit__get_me and pass its id (REQUIRED so the twig lands in his list; an unassigned child twig is invisible to him).`,
-      '    • description = the apply URL and any blocker/context (reCAPTCHA, Ashby, login wall). Details go here, never in the title.',
+      '    • description = the apply URL, the job folder path where the files live (applications/<company-role>/, or applications/<company>/<company-role>/ if that company has multiple roles), and any blocker/context (reCAPTCHA, Ashby, login wall). Details go here, never in the title.',
       '    • then attach the prepared CV + cover PDF to that child twig with upload_twig_asset.',
       '- Mark this twig done with update_twig (status=done). REQUIRED: the recurrence only spawns the next run when this twig is completed.',
       'Your final reply message is auto-posted as a comment on this twig, so make it a summary of exactly what you applied to (which roles and where).',
