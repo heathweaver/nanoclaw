@@ -122,7 +122,9 @@ export class PaperclipChannel implements Channel {
           { port: this.port, paperclipApi: this.paperclipApiUrl },
           'Paperclip webhook server listening',
         );
-        console.log(`\n  Paperclip webhook: http://localhost:${this.port}/invoke`);
+        console.log(
+          `\n  Paperclip webhook: http://localhost:${this.port}/invoke`,
+        );
         console.log(`  Paperclip API:     ${this.paperclipApiUrl}`);
         console.log(`  Endpoints: POST /invoke, GET /health\n`);
         resolve();
@@ -309,8 +311,7 @@ export class PaperclipChannel implements Channel {
 
     // Paperclip API credentials for the agent to call back into Paperclip.
     // companyId may come from payloadTemplate or we read it from env.
-    const companyId =
-      (payload as Record<string, unknown>).companyId || '';
+    const companyId = (payload as Record<string, unknown>).companyId || '';
 
     const apiBlock = [
       '<paperclip-api>',

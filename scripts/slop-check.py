@@ -21,8 +21,11 @@ COMMENT = re.compile(r'<!--.*?-->', re.S)
 PARA  = re.compile(r'<p[^>]*>(.*?)</p>', re.S | re.I)
 TAG   = re.compile(r'<[^>]+>')
 
-INTENSIFIERS = re.compile(r'\b(robust|seamless|seamlessly|leverage|leveraging|delve|delved|wildly|deeply|cutting[- ]edge|unlock|unlocking|supercharge|game[- ]?chang\w*|effortless\w*|vibrant|stunning|elevate|elevating|myriad|plethora|tapestry|realm|landscape)\b', re.I)
-XNOTY = re.compile(r'\b(rather than|instead of)\b|,\s*not\s+\w|\bnot\s+\w+\s+but\b', re.I)
+INTENSIFIERS = re.compile(r'\b(robust|seamless|seamlessly|leverage|leveraging|delve|delved|wildly|deeply|cutting[- ]edge|unlock|unlocking|supercharge|game[- ]?chang\w*|effortless\w*|vibrant|stunning|elevate|elevating|myriad|plethora|tapestry|realm|landscape|pivotal|underscore\w*|crucial|garner\w*|foster\w*|testament|nestled|showcas\w+|groundbreaking|additionally|moreover|furthermore)\b', re.I)
+XNOTY = re.compile(r'\b(rather than|instead of)\b|,\s*not\s+\w|\bnot\s+\w+\s+but\b|\bnot\s+just\b|\bnot\s+only\b', re.I)
+COPULA = re.compile(r'\b(serves?|stands?|acts?)\s+as\b', re.I)
+PARTICIPLE = re.compile(r',\s*(highlighting|underscoring|showcasing|reflecting|emphasi[sz]ing|demonstrating|illustrating|contributing|cementing|solidifying)\b', re.I)
+SIGNIF = re.compile(r'\b(a testament to|enduring legacy|marks?\s+a\s+turning\s+point|stands?\s+as\s+a\b|cements?\s+its\b)', re.I)
 # bare past-tense / imperative verb openers common in CV-speak
 OPENERS = re.compile(r'^(Held|Built|Ran|Led|Made|Drove|Grew|Won|Kept|Took|Shipped|Designed|Created|Owned|Delivered|Launched|Managed|Founded|Coached|Processed|Migrated|Rebuilt|Ran|Build|Own|Design|Deploy|Ship)\b')
 
@@ -58,10 +61,18 @@ def check(path):
             viol.append((f'INTENSIFIER "{m.group(0)}"', p[max(0,m.start()-20):m.start()+30]))
         for m in XNOTY.finditer(p):
             viol.append((f'X-NOT-Y "{m.group(0).strip()}"', p[max(0,m.start()-20):m.start()+35]))
+        for m in COPULA.finditer(p):
+            viol.append((f'COPULA AVOIDANCE "{m.group(0)}" (use is/are)', p[max(0,m.start()-20):m.start()+30]))
+        for m in PARTICIPLE.finditer(p):
+            viol.append((f'PARTICIPLE SIGNIFICANCE TAIL "{m.group(1)}"', p[max(0,m.start()-25):m.start()+30]))
+        for m in SIGNIF.finditer(p):
+            viol.append((f'SIGNIFICANCE INFLATION "{m.group(0).strip()}"', p[max(0,m.start()-15):m.start()+30]))
         for m in re.finditer(r'\bno\s+\w+,\s*no\s+\w+', p, re.I):
             viol.append(('"no X, no Y" parallelism', p[max(0,m.start()-10):m.start()+45]))
         for m in re.finditer(r'\bgrains?\b', p, re.I):
             viol.append(('BANNED LEXICON "grains" (say "a skill paired with an evaluator and a grader")', p[max(0,m.start()-25):m.start()+20]))
+        for m in re.finditer(r'\b(solo|single-handed(?:ly)?|by myself|lone[- ]?(?:wolf|builder))\b', p, re.I):
+            viol.append((f'LONE-BUILDER FRAMING "{m.group(0)}" (never say Heath built/shipped/ran anything solo or alone; drop it, keep "end to end" if scope matters)', p[max(0,m.start()-25):m.start()+20]))
         for m in re.finditer(r'[a-zA-Z]:\s+\S', p):
             viol.append(('RHETORICAL COLON in prose (rework as two sentences or a comma)', p[max(0,m.start()-30):m.start()+25]))
         # paragraph-opener: first sentence starts with a bare verb

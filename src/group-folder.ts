@@ -1,6 +1,11 @@
 import path from 'path';
 
-import { DATA_DIR, GROUPS_DIR } from './config.js';
+import {
+  DATA_DIR,
+  EXTERNAL_GROUP_BASE,
+  EXTERNAL_GROUP_FOLDERS,
+  GROUPS_DIR,
+} from './config.js';
 
 const GROUP_FOLDER_PATTERN = /^[A-Za-z0-9][A-Za-z0-9_-]{0,63}$/;
 const RESERVED_FOLDERS = new Set(['global']);
@@ -30,8 +35,13 @@ function ensureWithinBase(baseDir: string, resolvedPath: string): void {
 
 export function resolveGroupFolderPath(folder: string): string {
   assertValidGroupFolder(folder);
-  const groupPath = path.resolve(GROUPS_DIR, folder);
-  ensureWithinBase(GROUPS_DIR, groupPath);
+  // Job-search workspaces live on the Synology-synced volume; everything else
+  // stays in the repo's groups/ directory. IPC and sessions always stay local.
+  const base = EXTERNAL_GROUP_FOLDERS.has(folder)
+    ? EXTERNAL_GROUP_BASE
+    : GROUPS_DIR;
+  const groupPath = path.resolve(base, folder);
+  ensureWithinBase(base, groupPath);
   return groupPath;
 }
 

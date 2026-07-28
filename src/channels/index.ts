@@ -11,6 +11,9 @@ import './slack.js';
 // paperclip
 import './paperclip.js';
 
+// twiglit
+import './twiglit.js';
+
 // telegram
 
 // whatsapp

@@ -7,7 +7,11 @@ import { isValidTimezone } from './timezone.js';
 // Read config values from .env (falls back to process.env).
 // Secrets (API keys, tokens) are NOT read here — they are loaded only
 // by the credential proxy (credential-proxy.ts), never exposed to containers.
-const envConfig = readEnvFile(['ASSISTANT_NAME', 'ASSISTANT_HAS_OWN_NUMBER', 'TZ']);
+const envConfig = readEnvFile([
+  'ASSISTANT_NAME',
+  'ASSISTANT_HAS_OWN_NUMBER',
+  'TZ',
+]);
 
 export const ASSISTANT_NAME =
   process.env.ASSISTANT_NAME || envConfig.ASSISTANT_NAME || 'Andy';
@@ -37,6 +41,22 @@ export const SENDER_ALLOWLIST_PATH = path.join(
 export const STORE_DIR = path.resolve(PROJECT_ROOT, 'store');
 export const GROUPS_DIR = path.resolve(PROJECT_ROOT, 'groups');
 export const DATA_DIR = path.resolve(PROJECT_ROOT, 'data');
+
+// Job-search group workspaces live on the Synology Drive-synced volume, not in
+// the repo, so their output (tailored CVs, cover letters, paste sheets) reaches
+// Heath's other devices via the NAS with no copy step. These folders resolve to
+// EXTERNAL_GROUP_BASE instead of GROUPS_DIR; the container bind-mounts the
+// resolved path directly, so the agent writes straight into the synced tree.
+// Everything else (main, slack_main, telegram_main, global) stays under GROUPS_DIR.
+export const EXTERNAL_GROUP_BASE =
+  process.env.EXTERNAL_GROUP_BASE ||
+  path.join(HOME_DIR, 'sDrive', 'Career', '03-Job Search');
+export const EXTERNAL_GROUP_FOLDERS = new Set(
+  (process.env.EXTERNAL_GROUP_FOLDERS || 'fde,blitz,twiglit-chat')
+    .split(',')
+    .map((s) => s.trim())
+    .filter(Boolean),
+);
 
 export const CONTAINER_IMAGE =
   process.env.CONTAINER_IMAGE || 'nanoclaw-agent:latest';

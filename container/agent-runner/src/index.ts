@@ -470,6 +470,7 @@ async function runQuery(
         'NotebookEdit',
         'mcp__nanoclaw__*',
         'mcp__getajobai__*',
+        'mcp__twiglit__*',
       ],
       env: sdkEnv,
       permissionMode: 'bypassPermissions',
@@ -492,6 +493,17 @@ async function runQuery(
                 url: 'https://getajobai.ssc.pm/mcp',
                 headers: {
                   Authorization: `Bearer ${process.env.GETAJOB_MCP_TOKEN}`,
+                },
+              },
+            }
+          : {}),
+        ...(process.env.TWIGLIT_API_KEY
+          ? {
+              twiglit: {
+                type: 'http' as const,
+                url: `${process.env.TWIGLIT_BASE_URL || 'https://app.twigl.it'}/mcp`,
+                headers: {
+                  Authorization: `Bearer ${process.env.TWIGLIT_API_KEY}`,
                 },
               },
             }

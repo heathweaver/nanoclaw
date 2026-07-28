@@ -251,9 +251,21 @@ function buildContainerArgs(
 
   // Forward the getajob MCP token (read from .env) to the container agent so the
   // jobsearch intake can create job entries via the getajob MCP server.
-  const extraSecrets = readEnvFile(['GETAJOB_MCP_TOKEN']);
+  const extraSecrets = readEnvFile([
+    'GETAJOB_MCP_TOKEN',
+    'TWIGLIT_API_KEY',
+    'TWIGLIT_BASE_URL',
+  ]);
   if (extraSecrets.GETAJOB_MCP_TOKEN) {
     args.push('-e', `GETAJOB_MCP_TOKEN=${extraSecrets.GETAJOB_MCP_TOKEN}`);
+  }
+  // Forward the Twiglit API key so twig/chat runs can comment, attach files,
+  // create subtasks, and mark twigs done via the Twiglit MCP.
+  if (extraSecrets.TWIGLIT_API_KEY) {
+    args.push('-e', `TWIGLIT_API_KEY=${extraSecrets.TWIGLIT_API_KEY}`);
+  }
+  if (extraSecrets.TWIGLIT_BASE_URL) {
+    args.push('-e', `TWIGLIT_BASE_URL=${extraSecrets.TWIGLIT_BASE_URL}`);
   }
 
   // Runtime-specific args for host gateway resolution

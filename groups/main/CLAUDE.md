@@ -166,7 +166,7 @@ Fields:
 ### Trigger Behavior
 
 - **Main group** (`isMain: true`): No trigger needed — all messages are processed automatically
-- **Groups with `requiresTrigger: false`**: No trigger needed — all messages processed (use for 1-on-1 or solo chats)
+- **Groups with `requiresTrigger: false`**: No trigger needed — all messages processed (use for 1-on-1 or end to end chats)
 - **Other groups** (default): Messages must start with `@AssistantName` to be processed
 
 ### Adding a Group

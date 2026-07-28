@@ -320,11 +320,16 @@ async function runAgent(
   onOutput?: (output: ContainerOutput) => Promise<void>,
 ): Promise<'success' | 'error'> {
   const isMain = group.isMain === true;
-  // The jobsearch intake agent is stateless: every message is an independent job,
-  // and the fit criteria live in its CLAUDE.md. Never resume its session, so each
-  // run reloads the current CLAUDE.md instead of carrying an old system prompt.
-  const sessionId =
-    group.folder === 'jobsearch' ? undefined : sessions[group.folder];
+  // The job-search agents are stateless: every message is an independent job, and
+  // the fit criteria live in each track's CLAUDE.md. Never resume their session, so
+  // each run reloads the current CLAUDE.md instead of carrying an old system prompt.
+  // This also isolates concurrent runs within a track folder: without it, two twigs
+  // hitting the same `fde` (or `blitz`) folder would resume each other's context.
+  // The blitz and fde track workspaces must stay stateless.
+  const statelessFolders = new Set(['blitz', 'fde']);
+  const sessionId = statelessFolders.has(group.folder)
+    ? undefined
+    : sessions[group.folder];
 
   // Update tasks snapshot for container to read (filtered by group)
   const tasks = getAllTasks();
@@ -653,6 +658,10 @@ async function main(): Promise<void> {
       isGroup?: boolean,
     ) => storeChatMetadata(chatJid, timestamp, name, channel, isGroup),
     registeredGroups: () => registeredGroups,
+    ensureGroup: (jid: string, group: RegisteredGroup) => {
+      if (registeredGroups[jid]) return;
+      registerGroup(jid, group);
+    },
   };
 
   // Create and connect all registered channels.

@@ -9,6 +9,13 @@ export interface ChannelOpts {
   onMessage: OnInboundMessage;
   onChatMetadata: OnChatMetadata;
   registeredGroups: () => Record<string, RegisteredGroup>;
+  /**
+   * Idempotently register a group so the message loop will process its JID.
+   * Used by channels that receive ad-hoc conversation IDs (e.g. a Twiglit
+   * twig assigned on the fly) which cannot be pre-registered by the user.
+   * No-op if the JID is already registered.
+   */
+  ensureGroup: (jid: string, group: RegisteredGroup) => void;
 }
 
 export type ChannelFactory = (opts: ChannelOpts) => Channel | null;
